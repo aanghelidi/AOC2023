@@ -1,0 +1,28 @@
+version: '3'
+
+tasks:
+  download-day:
+    dotenv: ['.env']
+    dir: '{{.USER_WORKING_DIR}}'
+    preconditions:
+      - test -f .env
+    cmds:
+        - mkdir -p {{.YEAR}}/day0{{.DAY}}
+        - touch {{.USER_WORKING_DIR}}/{{.YEAR}}/day0{{.DAY}}/input.txt
+        - curl -b session=$AOC_SESSION -o {{.USER_WORKING_DIR}}/{{.YEAR}}/day0{{.DAY}}/input.txt https://adventofcode.com/{{.YEAR}}/day/{{.DAY}}/input
+        - cp {{.USER_WORKING_DIR}}/templates/* {{.USER_WORKING_DIR}}/{{.YEAR}}/day0{{.DAY}}/
+        - less {{.USER_WORKING_DIR}}/{{.YEAR}}/day0{{.DAY}}/input.txt
+    status:
+      - test -d {{.YEAR}}/day0{{.DAY}}
+      - test -f {{.USER_WORKING_DIR}}/{{.YEAR}}/day0{{.DAY}}/input.txt
+    vars:
+      YEAR:
+        sh: gum choose "2015" "2016" "2017" "2018" "2019" "2020" "2021" "2022" "2023"
+      DAY:
+        sh: gum choose "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22" "23" "24" "25"
+    usage: Generate a new day boilerplate with the given day number.
+    help: |
+      Generate a new day boilerplate given the day number and year.
+      Example: task dd 
+    aliases:
+      - dd
