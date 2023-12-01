@@ -1,9 +1,10 @@
+#!/usr/bin/perl
 use v5.36;
 
 my $ans   = 0;
 my $ans2  = 0;
 my %numsd = qw(one 1 two 2 three 3 four 4 five 5 six 6 seven 7 eight 8 nine 9);
-open( my $f, "<", "input.txt" );
+open( my $f, "<", $ARGV[0] );
 while (<$f>) {
     my @nums = $_ =~ /(\d{1})/g;
     $ans += $nums[0] . $nums[-1];
