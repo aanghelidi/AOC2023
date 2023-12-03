@@ -1,48 +1,48 @@
 import sys
-from typing import NamedTuple, Generator
+from typing import Generator
+from dataclasses import dataclass
 import math
+import itertools
 
 with open(sys.argv[1]) as f:
     data = f.read().splitlines()
 
 
-class Point(NamedTuple):
+@dataclass(frozen=True)
+class Point:
     x: int
     y: int
 
 
-class PartNumber(NamedTuple):
+@dataclass(frozen=True)
+class PartNumber:
     value: int
     start: Point
     stop: Point
 
 
 def adjacent8(p: Point) -> Generator[Point, None, None]:
-    yield Point(p.x, p.y + 1)
-    yield Point(p.x, p.y - 1)
-    yield Point(p.x + 1, p.y)
-    yield Point(p.x - 1, p.y)
-    yield Point(p.x + 1, p.y + 1)
-    yield Point(p.x - 1, p.y - 1)
-    yield Point(p.x + 1, p.y - 1)
-    yield Point(p.x - 1, p.y + 1)
+    for x_offset, y_offset in itertools.product([-1, 0, 1], repeat=2):
+        if x_offset == 0 and y_offset == 0:
+            continue
+        yield Point(p.x + x_offset, p.y + y_offset)
 
 
 def is_symbol(c) -> bool:
     return not c.isdigit() and c != "."
 
 
+# Parse grid
 grid = {}
 ans = 0
 for y, line in enumerate(data):
     for x, c in enumerate(line):
         grid[Point(x, y)] = c
 
+# Find part numbers
 pnv = ""
-pns = []
-last_key = Point(0, 0)
-start = Point(0, 0)
-symbol_pos = []
+pns, symbol_pos = [], []
+start, last_key = Point(0, 0), Point(0, 0)
 for k, v in grid.items():
     if v.isdigit():
         pnv += v
@@ -57,6 +57,7 @@ for k, v in grid.items():
         start = None
     last_key = k
 
+# Part 1 and 2 solution
 part_numbers = set()
 ans2 = 0
 for k in symbol_pos:
