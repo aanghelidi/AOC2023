@@ -1,8 +1,8 @@
-import sys
-from typing import Generator
-from dataclasses import dataclass
-import math
 import itertools
+import math
+import sys
+from dataclasses import dataclass
+from typing import Generator
 
 with open(sys.argv[1]) as f:
     data = f.read().splitlines()

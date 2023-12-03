@@ -23,6 +23,6 @@ tasks:
     usage: Generate a new day boilerplate with the given day number.
     help: |
       Generate a new day boilerplate given the day number and year.
-      Example: task dd 
+      Example: task dd
     aliases:
       - dd
