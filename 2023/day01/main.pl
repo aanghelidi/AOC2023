@@ -8,7 +8,8 @@ open( my $f, "<", $ARGV[0] );
 while (<$f>) {
     my @nums = $_ =~ /(\d{1})/g;
     $ans += $nums[0] . $nums[-1];
-    my @nums2 = $_ =~ /(?=(\d{1}|one|two|three|four|five|six|seven|eight|nine))/g;
+    my @nums2 =
+      $_ =~ /(?=(\d{1}|one|two|three|four|five|six|seven|eight|nine))/g;
     my $first = exists $numsd{ $nums2[0] }  ? $numsd{ $nums2[0] }  : $nums2[0];
     my $last  = exists $numsd{ $nums2[-1] } ? $numsd{ $nums2[-1] } : $nums2[-1];
     $ans2 += $first . $last;

@@ -13,3 +13,8 @@ repos:
       - id: ruff
         args: [ --fix ]
       - id: ruff-format
+
+  - repo: https://github.com/perltidy/perltidy
+    rev: '20230912.05'
+    hooks:
+      - id: perltidy
