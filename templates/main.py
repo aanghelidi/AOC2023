@@ -1,4 +1,6 @@
-with open("input.txt") as f:
+import sys
+
+with open(sys.argv[1]) as f:
     data = f.read().splitlines()
 
 ans = 0
