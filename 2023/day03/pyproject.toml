@@ -1,0 +1,42 @@
+[tool.ruff]
+select = [
+  "E",
+  "W",
+  "F",
+  "Q",
+  "UP",
+  "C90",
+  "I",
+  "N",
+  "C4",
+  "TRY",
+]
+
+ignore = [
+    "N806",
+]
+
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+line-length = 120
