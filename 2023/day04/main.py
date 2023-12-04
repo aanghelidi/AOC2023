@@ -8,7 +8,7 @@ with open(sys.argv[1]) as f:
     data = f.read().splitlines()
 
 
-@dataclass
+@dataclass(frozen=True)
 class Card:
     id: int
     winning_numbers: set[int] = field(default_factory=set)
