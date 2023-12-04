@@ -15,11 +15,11 @@ class Card:
     numbers: set[int] = field(default_factory=set)
 
     @classmethod
-    def parse(cls, data, id):
-        winning_numbers, numbers = data.split(": ")[1].split(" | ")
+    def parse(cls, line: str, idx: int) -> "Card":
+        winning_numbers, numbers = line.split(": ")[1].split(" | ")
         winning_numbers = {int(x) for x in winning_numbers.split()}
         numbers = {int(x) for x in numbers.split()}
-        return cls(id, winning_numbers, numbers)
+        return cls(idx, winning_numbers, numbers)
 
     def matching_winning_numbers(self) -> set[int]:
         return self.winning_numbers & self.numbers
@@ -32,12 +32,12 @@ def retrieve_copies(n_matches: int, current_id: int) -> Generator[Card, None, No
 
 ans = 0
 card_counter = defaultdict(int)
-for i, line in enumerate(data, start=1):
-    card = Card.parse(line, i)
+for idx, line in enumerate(data, start=1):
+    card = Card.parse(line, idx)
     card_counter[card.id] += 1
     matching_winning_numbers = card.matching_winning_numbers()
     for _ in range(card_counter[card.id]):
-        for copy in retrieve_copies(len(matching_winning_numbers), i):
+        for copy in retrieve_copies(len(matching_winning_numbers), idx):
             card_counter[copy.id] += 1
     if len(matching_winning_numbers) > 0:
         ans += 2 ** (len(matching_winning_numbers) - 1)
