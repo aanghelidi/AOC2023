@@ -37,8 +37,26 @@ def explore_race_options(r: Race) -> int:
     return num_ways
 
 
+# instead of exploring all of the race options
+# we can solve this problem by solving a second order equation
+
+
+def solve_race(r: Race) -> int:
+    record = r.record_distance
+    budget = r.time_last
+    # equation is in the form of ax^2 + bx + c = 0
+    # so we can solve x1 and x2 using the quadratic formula
+    delta = budget**2 - 4 * record
+    if delta < 0:
+        return 0
+    x1 = (-budget + delta**0.5) / 2
+    x2 = (-budget - delta**0.5) / 2
+    return x1 - x2
+
+
 ans = 1
 for r in races:
-    ans *= explore_race_options(r)
+    # ans *= explore_race_options(r)
+    ans *= solve_race(r)
 
 print(ans)
