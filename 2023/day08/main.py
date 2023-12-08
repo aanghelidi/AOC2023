@@ -33,7 +33,7 @@ for i, current_node in enumerate(starts):
     count = 0
     for i in itertools.cycle(instructions):
         if i == "L":
-            current_node = graph[current_node][0] if i != "L" else graph[current_node][0]
+            current_node = graph[current_node][0]
         else:
             current_node = graph[current_node][1]
         count += 1
