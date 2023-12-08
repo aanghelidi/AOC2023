@@ -27,7 +27,7 @@ for i in itertools.cycle(instructions):
 
 print(f"Part 1: {ans}")
 
-starts = [k for k in graph if k.endswith("A")]
+starts = (k for k in graph if k.endswith("A"))
 steps_counter = {}
 for i, current_node in enumerate(starts):
     count = 0
