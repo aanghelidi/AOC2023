@@ -1,86 +1,71 @@
 import sys
-from dataclasses import dataclass
-from itertools import pairwise
-from typing import NamedTuple
+from collections import namedtuple
+
+from rich import print
 
 with open(sys.argv[1]) as f:
-    data = f.read()
+    data = f.read().strip().split("\n\n")
+
+seeds = [int(x) for x in data[0].split(": ")[1].split()]
+Map = namedtuple("Map", ["id", "maps"])
+maps = []
+for i, m in enumerate(data[1:]):
+    _, *ms = m.split("\n")
+    imap = []
+    for m in ms:
+        m = m.split()
+        imap.append([int(x) for x in m])
+    current_map = Map(i, imap)
+    maps.append(current_map)
 
 
-class MapRange(NamedTuple):
-    destination_range_start: int
-    source_range_start: int
-    range_length: int
+def apply_map(m: list[int], seed: int) -> int:
+    dst_range_start, src_range_start, range_length = m
+    if seed < src_range_start or seed > src_range_start + range_length:
+        return seed
+    src_range = range(src_range_start, src_range_start + range_length + 1)
+    dst_range = range(dst_range_start, dst_range_start + range_length + 1)
+    return dst_range[seed - src_range.start]
 
 
-@dataclass(frozen=True)
-class ConversionMap:
-    source_category: str
-    destination_category: str
-    maps: list[MapRange]
-
-    @classmethod
-    def parse(cls, s):
-        source_category, destination_category = s.split("-to-")
-        destination_category = destination_category.split(" ")[0]
-        maps = []
-        for line in s.split("\n")[1:]:
-            destination_range_start, source_range_start, range_length = (int(x) for x in line.split(" "))
-            maps.append(MapRange(destination_range_start, source_range_start, range_length))
-        return cls(source_category, destination_category, maps)
-
-
-ans = 0
-seeds, *maps = data.strip().split("\n\n")
-seeds = [int(x) for x in seeds.split(": ")[1].split(" ")]
-
-cv_maps: list[ConversionMap] = []
-for map in maps:
-    conversion_map = ConversionMap.parse(map)
-    cv_maps.append(conversion_map)
-
-
-def convert_with_maps(c_from: str, c_to: str, cv_maps: list[ConversionMap], seeds: list[int]) -> list[int]:
-    converted = set()
-    conversion_dict = {}
-    filtered_cv_maps = [
-        cv_map for cv_map in cv_maps if cv_map.source_category == c_from and cv_map.destination_category == c_to
-    ]
+def forward_pass(seeds: list[int], m: Map) -> list[int]:
+    tseeds = []
     for seed in seeds:
-        for cv_map in filtered_cv_maps:
-            for source_range_start, destination_range_start, range_length in cv_map.maps:
-                if seed in range(destination_range_start, destination_range_start + range_length):
-                    seed_converted = seed - destination_range_start + source_range_start
-                    converted.add(seed)
-                    conversion_dict[seed] = seed_converted
-    remaining_seeds = set(seeds) - converted
-    for seed in remaining_seeds:
-        conversion_dict[seed] = seed
-    return [conversion_dict[seed] for seed in seeds]
+        original_seed = seed
+        for im in m.maps:
+            seed = apply_map(im, seed)
+            if seed != original_seed:
+                tseeds.append(seed)
+                break
+        if seed == original_seed:
+            tseeds.append(seed)
+    return tseeds
 
 
-soils = convert_with_maps("seed", "soil", cv_maps, seeds)
-fertilizers = convert_with_maps("soil", "fertilizer", cv_maps, soils)
-waters = convert_with_maps("fertilizer", "water", cv_maps, fertilizers)
-lights = convert_with_maps("water", "light", cv_maps, waters)
-temperatures = convert_with_maps("light", "temperature", cv_maps, lights)
-humidities = convert_with_maps("temperature", "humidity", cv_maps, temperatures)
-locations = convert_with_maps("humidity", "location", cv_maps, humidities)
+inputs = seeds
+for m in maps:
+    inputs = forward_pass(inputs, m)
 
-print(f"Part 1: {min(locations)}")
+print(f"Part 1: {min(inputs)}")
 
 # Part 2
-ranges = [range(s1, s1 + s2) for idx, (s1, s2) in enumerate(pairwise(seeds)) if idx % 2 == 0]
 
-# def f(seeds):
-#    soils = convert_with_maps("seed", "soil", cv_maps, seeds)
-#    fertilizers = convert_with_maps("soil", "fertilizer", cv_maps, soils)
-#    waters = convert_with_maps("fertilizer", "water", cv_maps, fertilizers)
-#    lights = convert_with_maps("water", "light", cv_maps, waters)
-#    temperatures = convert_with_maps("light", "temperature", cv_maps, lights)
-#    humidities = convert_with_maps("temperature", "humidity", cv_maps, temperatures)
-#    locations = convert_with_maps("humidity", "location", cv_maps, humidities)
-#    return min(locations)
-#
-# with mp.Pool(20) as p:
-#    print(f"Part 2: {min(p.map(f, ranges,chunksize=1024))}")
+ranges = [range(e, e + length) for e, length in zip(seeds[::2], seeds[1::2])]
+
+
+def objective(trial, irange):
+    seed_candidate = trial.suggest_int("seed_candidate", ranges[irange].start, 2_000_000_000)
+    test = [seed_candidate]
+    for m in maps:
+        test = forward_pass(test, m)
+    return min(test)
+
+
+# Brute force
+# mins = {}
+##for i in range(len(ranges)):
+# study: Study = optuna.create_study(direction="minimize")
+# study.optimize(lambda trial: objective(trial,2), n_trials=20_000, show_progress_bar=True)
+# mins[2] = study.best_value
+# print(f"{study.best_params=} {study.best_value=}")
+# print(f"Part 2: {min(mins.values())}")
