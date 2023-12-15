@@ -14,8 +14,8 @@ def hash_algorithm(s: str) -> int:
     return current
 
 
-def focusing_power(key: int, boxes: defaultdict[int, list[tuple[str, int]]]) -> int:
-    return sum((key + 1) * sn * fl for sn, (_, fl) in enumerate(boxes[key], start=1))
+def focusing_power(box: int, boxes: defaultdict[int, list[tuple[str, int]]]) -> int:
+    return sum((box + 1) * sn * fl for sn, (_, fl) in enumerate(boxes[box], start=1))
 
 
 print(f"Part 1: {sum(hash_algorithm(seq) for seq in sequences)}")
@@ -48,4 +48,4 @@ for seq in sequences:
         else:
             boxes[bn].append((label, fl))
 
-print(f"Part 2: {sum(focusing_power(key, boxes) for key in boxes)}")
+print(f"Part 2: {sum(focusing_power(box, boxes) for box in boxes)}")
