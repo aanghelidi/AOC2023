@@ -34,12 +34,8 @@ for line in data:
 xpx, ypy, zpz, vvx, vvy, vvz = symbols("xpx, ypy, zpz, vvx, vvy, vvz")
 eqns = []
 for i, h in enumerate(hailstones):
-    px = h.initial_position.x
-    py = h.initial_position.y
-    pz = h.initial_position.z
-    vx = h.velocity.x
-    vy = h.velocity.y
-    vz = h.velocity.z
+    px, py, pz = h.initial_position
+    vx, vy, vz = h.velocity
     eqns.append((xpx - px) * (vy - vvy) - (ypy - py) * (vx - vvx))
     eqns.append((ypy - py) * (vz - vvz) - (zpz - pz) * (vy - vvy))
     if i < 2:
